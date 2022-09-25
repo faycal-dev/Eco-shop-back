@@ -9,15 +9,17 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ["image", "alt_text"]
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    product_image = ImageSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Product
-        fields = ["id", "category", "title", "description", "slug", "regular_price", "product_image"]
-
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["name", "slug"]
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    product_image = ImageSerializer(many=True, read_only=True)
+    # category = CategorySerializer() if you want to add the category details in product data
+
+    class Meta:
+        model = Product
+        fields = ["id", "category", "title", "description",
+                  "slug", "regular_price", "product_image"]

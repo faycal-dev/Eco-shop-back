@@ -20,7 +20,7 @@ class Product(generics.RetrieveAPIView):
 class CategoryItemView(generics.ListAPIView):
     serializer_class = ProductSerializer
 
-    # this function is used to retrive all products with the desired category
+    # this function is used to retrive all products with the desired category or its decendents
     def get_queryset(self):
         return models.Product.objects.filter(
             category__in=Category.objects.get(slug=self.kwargs["slug"]).get_descendants(include_self=True)
