@@ -1,5 +1,4 @@
-from email.policy import default
-import django
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 # gettext_lazy is used before any text we want to translate based on the system language.
@@ -44,6 +43,9 @@ class Category(MPTTModel):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        managed = True
 
 
 class ProductType(models.Model):
@@ -64,9 +66,13 @@ class ProductType(models.Model):
         # model config
         verbose_name = _("Product type")
         verbose_name_plural = _("Product types")
+    
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        managed = True
 
 
 class ProductSpecification(models.Model):
@@ -85,6 +91,9 @@ class ProductSpecification(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        managed = True
 
 
 class Product(models.Model):
@@ -110,7 +119,7 @@ class Product(models.Model):
                 "max_length": _("The price must be between 0 and 99999.99."),
             },
         },
-        max_digits=7,
+        max_digits=10,
         decimal_places=2,
     )
     discount_price = models.DecimalField(
@@ -155,17 +164,26 @@ class Product(models.Model):
     created_at = models.DateTimeField(
         _("Created at"), auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
+    users_wishlist = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="user_wishlist", blank=True)
 
     class Meta:
         ordering = ("-created_at",)
         verbose_name = _("Product")
         verbose_name_plural = _("Products")
+    
+    @property
+    def productSpecificationValue(self):
+        return self.productspecificationvalue_set.all()
 
     def get_absolute_url(self):
         return reverse("store:product_detail", args=[self.slug])
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        managed = True
 
 
 class ProductSpecificationValue(models.Model):
@@ -188,9 +206,11 @@ class ProductSpecificationValue(models.Model):
     class Meta:
         verbose_name = _("Product Specification Value")
         verbose_name_plural = _("Product Specification Values")
+        managed = True
 
     def __str__(self):
         return self.value
+
 
 
 class ProductImage(models.Model):
@@ -222,3 +242,4 @@ class ProductImage(models.Model):
     class Meta:
         verbose_name = _("Product Image")
         verbose_name_plural = _("Product Images")
+        managed = True

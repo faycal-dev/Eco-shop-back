@@ -1,3 +1,7 @@
+from tkinter import E
+from django.shortcuts import get_object_or_404, render
+
+# Create your views here.
 # auth logic for JWT
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -86,7 +90,6 @@ class RegisterView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
         except Exception as e:
-            print(e)
             return Response(
                 {'error': 'Something went wrong when trying to register account'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -198,9 +201,88 @@ class LoadUserView(APIView):
                 {'user': user.data},
                 status=status.HTTP_200_OK
             )
-        except:
+        except Exception as e:
             return Response(
                 {'error': 'Something went wrong when trying to load user'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class ChangeUserCredentials(APIView):
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def put(self, request):
+        try:
+            id = request.user.id
+            user = get_object_or_404(User, id=id)
+            data = request.data
+            verification_email_sent = False
+            if (data["email"] != user.email):
+                user.email = data["email"]
+                user.is_verified = False
+                user.save()
+                current_user = user
+                token = RefreshToken.for_user(
+                    current_user).access_token
+                current_site = get_current_site(request).domain
+                # relativeLink = reverse('email-verify')
+                absurl = 'http://'+current_site + \
+                    "/account/email-verify"+"?token="+str(token)
+                email_body = 'Hi '+user.user_name + \
+                    ' Use the link below to verify your email \n' + absurl
+                data = {'email_body': email_body, 'to_email': user.email,
+                        'email_subject': 'Verify your email'}
+                Util.send_email(data)
+                verification_email_sent = True
+
+            if (data["full_name"] != user.full_name):
+                user.full_name = data["full_name"]
+                user.save()
+
+            return Response({"message": "User modified successfully", "user": UserSerializer(user).data, "verification_email": verification_email_sent}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'error': 'Something went wrong when trying to modify user'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class ChangeUserImage(APIView):
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def put(self, request):
+        id = request.user.id
+        user = get_object_or_404(User, id=id)
+        try:
+            image = request.data["image"]
+            user.image = image
+            user.save()
+            return Response({"message": "User image updated successfully"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'error': 'Something went wrong when trying to modify user password'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+            
+class ChangePassword(APIView):
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def put(self, request):
+        id = request.user.id
+        user = get_object_or_404(User, id=id)
+        try:
+            old_password = request.data["old_password"]
+            new_password = request.data["new_password"]
+            if not user.check_password(old_password):
+                return Response({"error": "Please verify if your password is correct"}, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                user.set_password(new_password)
+                user.save()
+                return Response({"message": "password updated successfully"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'error': 'Something went wrong when trying to modify user password'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 

@@ -1,10 +1,15 @@
 from django.db import models
+
+# Create your models here.
+from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
+def directory_path(instance, filename):
+    return f'user/{instance.user_name}/{filename}'
 
 class CustomAccountManager(BaseUserManager):
 
@@ -42,6 +47,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     user_name = models.CharField(max_length=150, unique=True)
     full_name = models.CharField(max_length=150, blank=True)
     start_date = models.DateTimeField(default=timezone.now)
+    image = models.ImageField(
+        verbose_name=_("image"),
+        help_text=_("Upload a user image"),
+        upload_to=directory_path,
+        default="images/user/default.png",
+    )
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

@@ -9,7 +9,7 @@ from .models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('full_name', 'email', 'username', )
+        fields = ('full_name', 'email', 'user_name', "image", "is_verified")
 
 
 class EmailVerificationSerializer(serializers.ModelSerializer):
