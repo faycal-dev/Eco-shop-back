@@ -1,18 +1,13 @@
-from tkinter import E
-from django.shortcuts import get_object_or_404, render
-
-# Create your views here.
-# auth logic for JWT
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, status, generics
 from .models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
+from django.utils.encoding import smart_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
 import jwt
 from django.http import HttpResponsePermanentRedirect
 from django.conf import settings
