@@ -165,7 +165,7 @@ CLOUDINARY_STORAGE = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3001",
     "http://127.0.0.1:3001",
-    "0.0.0.0"
+    "https://eco-shop.up.railway.app/"
 ]
 
 SIMPLE_JWT = {
