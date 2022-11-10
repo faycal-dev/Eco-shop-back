@@ -165,7 +165,8 @@ CLOUDINARY_STORAGE = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3001",
     "http://127.0.0.1:3001",
-    "https://eco-shop.up.railway.app/"
+    "https://eco-shop.up.railway.app/",
+    "https://eco-shop-iota.vercel.app/"
 ]
 
 SIMPLE_JWT = {
