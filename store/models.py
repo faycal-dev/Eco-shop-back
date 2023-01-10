@@ -3,6 +3,7 @@ from django.db import models
 from django.urls import reverse
 # gettext_lazy is used before any text we want to translate based on the system language.
 from django.utils.translation import gettext_lazy as _
+# mptt is used for hiarcical data in a tree form
 from mptt.models import MPTTModel, TreeForeignKey
 
 
